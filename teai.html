@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang='ja'>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>曽根崎支部レート</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/teai.js" defer></script>
+</head>
+<body>
+
+<div class="rateInfo-page">
+    <div class="header">
+        <a href="index.html">曽根崎支部　レートシステム</a>
+    </div>
+    
+    <div id="loader" class="mini-loader">読み込み中...</div>
+
+  <div id="search-area" class="vertical-container" style="display: none;">
+  
+  <div class="compare-card">
+    <div class="card-header">対局 1</div>
+    <div class="select-row">
+      <select id="name-a1" onchange="compareRates(1)"><option value="">対局者1</option></select>
+      <span class="vs">VS</span>
+      <select id="name-b1" onchange="compareRates(1)"><option value="">対局者2</option></select>
+    </div>
+    <div id="compare-result1" class="result-area"></div>
+  </div>
+
+  <div class="compare-card">
+    <div class="card-header">対局 2</div>
+    <div class="select-row">
+      <select id="name-a2" onchange="compareRates(2)"><option value="">対局者1</option></select>
+      <span class="vs">VS</span>
+      <select id="name-b2" onchange="compareRates(2)"><option value="">対局者2</option></select>
+    </div>
+    <div id="compare-result2" class="result-area"></div>
+  </div>
+
+  <div class="compare-card">
+    <div class="card-header">対局 3</div>
+    <div class="select-row">
+      <select id="name-a3" onchange="compareRates(3)"><option value="">対局者1</option></select>
+      <span class="vs">VS</span>
+      <select id="name-b3" onchange="compareRates(3)"><option value="">対局者2</option></select>
+    </div>
+    <div id="compare-result3" class="result-area"></div>
+  </div>
+
+</div>
+
+</div>
+
+</body>
+</html>
