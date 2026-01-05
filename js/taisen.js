@@ -1,13 +1,15 @@
 let allSheetData = [];
 let globalPassword = ""; 
 const gasUrl = "https://script.google.com/macros/s/AKfycbzct9JkpXhLXtRFRxve535FJl1tUG512w4V3-FCmh7DKclTcPrCrIrH54hEFo4UCzHOrg/exec";
-const AUTH_EXPIRY = 6 * 60 * 60 * 1000;
+const AUTH_EXPIRY = 6 * 60 * 60 * 1000; // 6時間有効
 const MAX_GAMES = 5;
 
+// ページ読み込み時の処理
 document.addEventListener('DOMContentLoaded', async () => {
-    // 認証処理（前回と同じ）
     const now = new Date().getTime();
     const savedAuth = localStorage.getItem('sonezaki_auth');
+
+    // 1. ローカルストレージに有効な認証があるか確認
     if (savedAuth) {
         const authData = JSON.parse(savedAuth);
         if (now - authData.time < AUTH_EXPIRY) {
@@ -16,27 +18,72 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
     }
+
+    // 2. 認証がない場合はGASへ確認（パスワード入力）
     await authenticateByGas();
 });
 
+// GASへ認証確認を行い、成功すればパスワードを保存
+async function authenticateByGas() {
+    const pass = prompt("管理用パスワードを入力してください");
+    if (!pass) { 
+        window.location.href = "index.html"; 
+        return; 
+    }
+
+    const loader = document.getElementById('loader');
+    if (loader) loader.textContent = "認証中...";
+
+    try {
+        const response = await fetch(gasUrl, {
+            method: "POST",
+            body: JSON.stringify({ type: "auth_check", password: pass })
+        });
+        const result = await response.json();
+
+        if (result.status === "success") {
+            globalPassword = pass;
+            // パスワードと時間を保存
+            localStorage.setItem('sonezaki_auth', JSON.stringify({
+                password: pass,
+                time: new Date().getTime()
+            }));
+            loadTaisenData();
+        } else {
+            alert("パスワードが違います。");
+            window.location.href = "index.html";
+        }
+    } catch (e) {
+        alert("認証エラーが発生しました。");
+        window.location.href = "index.html";
+    }
+}
+
+// 名簿データの読み込みと入力欄の生成
 async function loadTaisenData() {
     const loader = document.getElementById('loader');
     const inputArea = document.getElementById('input-area');
+    
     try {
+        // GASのdoGetからシートデータを取得
         const response = await fetch(gasUrl);
         allSheetData = await response.json();
         
         createGameInputs(); // 5行分の入力欄を作成
-        loader.style.display = "none";
-        inputArea.style.display = "block";
+        
+        if (loader) loader.style.display = "none";
+        if (inputArea) inputArea.style.display = "block";
     } catch (e) {
-        loader.textContent = "データの読み込みに失敗しました。";
+        if (loader) loader.textContent = "データの読み込みに失敗しました。";
+        console.error(e);
     }
 }
 
 // 5行分の入力UIを生成
 function createGameInputs() {
     const container = document.getElementById('games-container');
+    if (!container) return;
+    
     container.innerHTML = "";
     for (let i = 0; i < MAX_GAMES; i++) {
         const row = document.createElement('div');
@@ -45,19 +92,20 @@ function createGameInputs() {
         
         row.innerHTML = `
             <span style="font-size: 10px; color: #8b4513; width: 12px;">${i+1}</span>
-            <select class="win-sel" onchange="calculateNewRates()" style="flex: 1; min-width: 0; border: 1px solid blue;">
+            <select class="win-sel" onchange="calculateNewRates()" style="flex: 1; min-width: 0; border: 1px solid blue; height: 28px; font-size: 12px;">
                 <option value="">勝者</option>
             </select>
             <span style="font-size: 10px;">vs</span>
-            <select class="lose-sel" onchange="calculateNewRates()" style="flex: 1; min-width: 0; border: 1px solid red;">
+            <select class="lose-sel" onchange="calculateNewRates()" style="flex: 1; min-width: 0; border: 1px solid red; height: 28px; font-size: 12px;">
                 <option value="">敗者</option>
             </select>
         `;
         container.appendChild(row);
 
-        // プルダウンの生成（中身は以前と同じ）
         const winSel = row.querySelector('.win-sel');
         const loseSel = row.querySelector('.lose-sel');
+        
+        // シートデータ（1行目が見出しと想定）からプルダウン作成
         allSheetData.slice(1).forEach(r => {
             if(r[0]) {
                 winSel.add(new Option(r[0], r[0]));
@@ -67,6 +115,7 @@ function createGameInputs() {
     }
 }
 
+// レート変動のプレビュー計算
 function calculateNewRates() {
     const winSels = document.querySelectorAll('.win-sel');
     const loseSels = document.querySelectorAll('.lose-sel');
@@ -78,25 +127,25 @@ function calculateNewRates() {
     for (let i = 0; i < MAX_GAMES; i++) {
         const w = winSels[i].value;
         const l = loseSels[i].value;
-        if (!w && !l) continue;
+        if (!w || !l) continue;
+
+        // 重複チェック（同じ人が複数回出てこないか）
         if (w === l || playersInvolved.has(w) || playersInvolved.has(l)) {
             hasDuplicate = true;
         }
-        if (w) playersInvolved.add(w);
-        if (l) playersInvolved.add(l);
-        if (w && l) {
-            games.push({ winner: w, loser: l });
-        }
+        playersInvolved.add(w);
+        playersInvolved.add(l);
+        games.push({ winner: w, loser: l });
     }
 
     if (hasDuplicate) {
-        preview.innerHTML = `<div style="color:red; text-align:center; font-weight:bold; font-size:12px;">警告：重複があります</div>`;
+        preview.innerHTML = `<div style="color:red; text-align:center; font-weight:bold; font-size:12px;">警告：対局者の重複または同一人物対局があります</div>`;
         window.pendingGames = null;
         return;
     }
 
     if (games.length === 0) {
-        preview.innerHTML = `<div style="color:#888; text-align:center; font-size:11px;">対局者を選択してください</div>`;
+        preview.innerHTML = `<div style="color:#888; text-align:center; font-size:13px;">対局者を選択してください</div>`;
         window.pendingGames = null;
         return;
     }
@@ -110,7 +159,7 @@ function calculateNewRates() {
         const rWin = Number(winData[1]);
         const rLose = Number(loseData[1]);
 
-        // --- ハンデキャップ計算ロジック ---
+        // ハンデキャップ計算ロジック
         let diff = Math.abs(rWin - rLose);
         let handicap = 0;
 
@@ -121,13 +170,11 @@ function calculateNewRates() {
         else if (diff >= 1000 && diff <= 1199) handicap = 900;
         else if (diff >= 1200) handicap = 1100;
 
-        // レートが低い方にハンデを加算
         let adjWin = rWin;
         let adjLose = rLose;
         if (rWin < rLose) adjWin += handicap;
         else if (rLose < rWin) adjLose += handicap;
 
-        // 補正後のレート差をチェック
         let adjDiff = Math.abs(adjWin - adjLose);
         let move = 0;
 
@@ -135,9 +182,6 @@ function calculateNewRates() {
             const K = 24;
             const expected = 1 / (1 + Math.pow(10, (adjLose - adjWin) / 400));
             move = Math.round(K * (1 - expected));
-        } else {
-            // 補正後も差が400以上の場合は変動なし
-            move = 0;
         }
 
         const winColor = move === 0 ? "#666" : "blue";
@@ -163,6 +207,7 @@ function calculateNewRates() {
     window.pendingGames = pendingResults;
 }
 
+// 確定ボタン押下でGASへ一括送信
 async function sendToSheet() {
     if (!window.pendingGames || window.pendingGames.length === 0) return;
     if (!confirm(`${window.pendingGames.length}件の対局結果を更新しますか？`)) return;
@@ -188,8 +233,9 @@ async function sendToSheet() {
             msg.textContent = "全件更新完了しました。";
             setTimeout(() => location.reload(), 1500);
         } else {
-            alert(result.message);
+            alert("エラー: " + result.message);
             btn.disabled = false;
+            msg.textContent = "";
         }
     } catch (e) {
         msg.textContent = "通信エラーが発生しました。";

@@ -1,6 +1,7 @@
 a{
     text-decoration: none;
 }
+
 /* トップページ */
 .top-page{
     background-color:rgb(245, 245, 245) ;
@@ -106,7 +107,7 @@ a{
     border-bottom: 1px solid #dddddd;
 }
 
-/* ローディング画面を真ん中に固定 */
+
 #loader {
   position: fixed;
   top: 0; left: 0;
@@ -135,7 +136,7 @@ a{
 /* 手合表 */
 /* 全体の容器 */
 .compare-container {
-  max-width: 500px;
+  max-width: 600px;
   margin: 20px auto;
   padding: 20px;
   font-family: sans-serif;
@@ -168,7 +169,6 @@ select {
   color: #999;
 }
 
-/* 結果表示のスタイル */
 #compare-result {
   margin-top: 15px;
   padding: 15px;
@@ -198,28 +198,28 @@ select {
   padding-top: 10px;
 }
 
-/* 背景色*/
 body { background-color: #fdfcf9; margin: 15px; font-family: sans-serif; }
 
 .vertical-container {
-  display: flex;
-  flex-direction: column;
-  gap: 15px; /* ブロック間隔を30pxから15pxへ半分に */
-  max-width: 420px;
-  margin: 0 auto;
-}
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+    width: 100%; 
+    margin: 0 auto;
+    align-items: center;
 
-/* 将棋盤カード：高さを抑える */
 .compare-card {
-  background: #f3efdd; /* 少しだけ明るい盤の色 */
-  border: 1px solid #383838;
-  border-radius: 5px;
-  padding: 10px 15px; /* 上下パディングを15pxから10pxへ */
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    background: #f3efdd;
+    border: 1px solid #383838;
+    border-radius: 5px;
+    padding: 10px 15px;
+    box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    width: 300px;
+    box-sizing: border-box;
 }
 
 .card-header {
-  font-size: 12px; /* 少し小さく */
+  font-size: 12px;
   color: #5d2e0a;
   margin-bottom: 6px;
   font-weight: bold;
@@ -227,7 +227,6 @@ body { background-color: #fdfcf9; margin: 15px; font-family: sans-serif; }
   padding-left: 6px;
 }
 
-/* 選択エリア：スリム化 */
 .select-row {
   display: flex;
   align-items: center;
@@ -237,22 +236,21 @@ body { background-color: #fdfcf9; margin: 15px; font-family: sans-serif; }
 
 select {
   flex: 1;
-  padding: 4px; /* 6pxから4pxへ */
+  padding: 4px;
   border: 1px solid #383838;
   background: #ffffff;
   font-size: 14px;
-  height: 30px; /* 高さを固定 */
+  height: 30px;
 }
 
 .vs { font-size: 11px; font-weight: bold; color: #8b4513; }
 
-/* 結果表示エリア：高さを圧縮 */
 .result-area {
   padding: 8px 12px;
   background: rgba(255,255,255,0.75);
   border: 1px inset #8b4513;
   border-radius: 3px;
-  min-height: auto; /* 高さを内容に合わせる */
+  min-height: auto;
 }
 
 .res-line {
@@ -282,22 +280,19 @@ select {
 }
 
 /* レート更新ページ */
-/* 全体のコンテナ制限 */
 .rateInfo-page {
     max-height: 667px;
-    overflow: hidden; /* はみ出し防止 */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     padding: 5px;
 }
 
-/* カード内の余白を極限まで削る */
 .compare-card {
     padding: 8px !important;
     margin-top: 5px !important;
 }
 
-/* 入力行をコンパクトに（横並び） */
 .game-row {
     display: flex;
     align-items: center;
@@ -312,15 +307,13 @@ select {
     height: 28px;
 }
 
-/* プレビューエリアの高さを制限 */
 #update-preview {
     max-height: 100px;
-    overflow-y: auto; /* 5件超えたらスクロール */
+    overflow-y: auto;
     font-size: 11px;
     margin-top: 5px !important;
 }
 
-/* ボタンを少し小さく */
 #submit-btn {
     padding: 8px !important;
     margin-top: 8px !important;
