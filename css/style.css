@@ -200,13 +200,15 @@ select {
 
 body { background-color: #fdfcf9; margin: 15px; font-family: sans-serif; }
 
-.vertical-container {
+.vertical-container, 
+#input-area {
+    width: 80%;
+    max-width: 600px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 15px; 
-    width: 100%; 
-    margin: 0 auto;
     align-items: center;
+}
 
 .compare-card {
     background: #f3efdd;
@@ -214,10 +216,11 @@ body { background-color: #fdfcf9; margin: 15px; font-family: sans-serif; }
     border-radius: 5px;
     padding: 10px 15px;
     box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
-    width: 300px;
+    
+    width: 100%;
     box-sizing: border-box;
+    margin-top: 10px;
 }
-
 .card-header {
   font-size: 12px;
   color: #5d2e0a;
@@ -235,12 +238,13 @@ body { background-color: #fdfcf9; margin: 15px; font-family: sans-serif; }
 }
 
 select {
-  flex: 1;
-  padding: 4px;
-  border: 1px solid #383838;
-  background: #ffffff;
-  font-size: 14px;
-  height: 30px;
+    flex: 1;
+    padding: 6px 4px; 
+    border: 1px solid #383838;
+    background: #ffffff;
+    font-size: 14px;
+    height: 36px;
+    line-height: 1.2;
 }
 
 .vs { font-size: 11px; font-weight: bold; color: #8b4513; }
@@ -302,16 +306,22 @@ select {
 }
 
 .game-row select {
-    font-size: 12px;
-    padding: 2px;
-    height: 28px;
+    font-size: 14px;
+    padding: 4px;
+    height: 36px;
 }
 
 #update-preview {
-    max-height: 100px;
-    overflow-y: auto;
-    font-size: 11px;
-    margin-top: 5px !important;
+    max-height: none !important; 
+    overflow-y: visible !important; 
+    margin-top: 10px !important;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 12px;
+    border: 1px inset #8b4513;
+    border-radius: 4px;
+    min-height: 50px;
+    width: 100%; 
+    box-sizing: border-box;
 }
 
 #submit-btn {
